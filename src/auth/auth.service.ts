@@ -104,13 +104,25 @@ export class AuthService {
     // D. SUCCESS
     // Reset counters if they were previously bad
     if (user.failed_attempts > 0 || user.locked_until) {
+      
+      // 1. Reset the database
       await UserModel.query().patchAndFetchById(user.id, {
         failed_attempts: 0,
         locked_until: null,
       });
       
-      // Optional: Send Reactivation Email if previously locked
-      // await this.mailerService.sendMail(...)
+      // 2. Send Reactivation Email
+      // This runs only if the user was previously locked or had failed attempts
+      try {
+        await this.mailerService.sendMail({
+          to: user.email,
+          subject: 'Security Update: Account Restored',
+          template: './account-activated',
+          context: { name: user.name },
+        });
+      } catch (e) { 
+        console.log('Activation email failed:', e); 
+      }
     }
 
     await this.logAttempt(user.id, user.email, 'Success', ip);

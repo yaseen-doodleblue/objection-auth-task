@@ -12,7 +12,6 @@ import { join } from 'path';
     DatabaseModule,
     AuthModule,
     
-    // 👇 Configure Email Module
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (config: ConfigService) => ({
