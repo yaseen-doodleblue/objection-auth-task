@@ -13,6 +13,8 @@ export class UserModel extends Model {
   mobile!: string;
   role!: string;
   status!: string;
+  failed_attempts!: number;
+  locked_until!: string | null;
 
   // 3. Schema Validation (Optional but good for JSON Schema)
   static get jsonSchema() {
@@ -27,6 +29,8 @@ export class UserModel extends Model {
         mobile: { type: 'string' },
         role: { type: 'string' },
         status: { type: 'string' },
+        failed_attempts: { type: 'integer' },
+        locked_until: { type: ['string', 'null'] }
       },
     };
   }

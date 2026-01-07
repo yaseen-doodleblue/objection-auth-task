@@ -1,5 +1,4 @@
-import { Controller, Post, Body, UsePipes, HttpCode } from '@nestjs/common';
-import { Get, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body, UsePipes, HttpCode, Get, UseGuards, Request, Ip, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { JoiValidationPipe } from '../common/pipes/joi-validation.pipe';
@@ -13,31 +12,31 @@ import { AddEmployeeSchema } from './dto/add-employee.schema';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  // 1. SIGN UP
   @Post('signup')
   @UsePipes(new JoiValidationPipe(SignUpSchema))
   async signUp(@Body() body: any) {
     return this.authService.signUp(body);
   }
 
+  // 2. SIGN IN (Updated with IP Address)
   @Post('signin')
-  @HttpCode(200) // Standard for login is 200 OK
+  @HttpCode(200)
   @UsePipes(new JoiValidationPipe(SignInSchema))
-  async signIn(@Body() body: any) {
-    return this.authService.signIn(body);
+  // 👇 Capture IP address here
+  async signIn(@Body() body: any, @Ip() ip: string) {
+    return this.authService.signIn(body, ip);
   }
 
-  // Get Full Data from Database
+  // 3. GET PROFILE
   @Get('profile')
   @UseGuards(AuthGuard('jwt'))
   async getProfile(@Request() req) {
-    // 1. Take the ID from the token
     const userId = req.user.userId;
-
-    // 2. Ask the Service to find the full details in the Database
     return this.authService.getProfile(userId);
   }
 
-  // Add employee ENDPOINT
+  // 4. ADD EMPLOYEE
   @Post('add-employee')
   @UseGuards(AuthGuard('jwt'), RolesGuard) 
   @Roles('Admin') 
@@ -46,6 +45,16 @@ export class AuthController {
     return this.authService.addEmployee(body);
   }
 
-
+  // 5. GET ALL USERS (New Endpoint for Pagination & Filtering)
+  @Get('users')
+  @UseGuards(AuthGuard('jwt')) // Protected Route
+  async getAllUsers(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('search') search: string = '',
+    @Query('role') role: string = '',
+  ) {
+    // Convert page/limit to Numbers since Query params are strings
+    return this.authService.getAllUsers(Number(page), Number(limit), search, role);
+  }
 }
-

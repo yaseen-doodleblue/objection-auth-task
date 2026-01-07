@@ -22,6 +22,7 @@ import { join } from 'path';
           auth: {
             user: config.get('MAIL_USER'), 
             pass: config.get('MAIL_PASS'),  
+          },
         },
         defaults: {
           from: '"Test Company" <yaseen.doodleblue@gmail.com>',
