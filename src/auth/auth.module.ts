@@ -7,7 +7,7 @@ import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
-    // Configure JWT with the Secret from .env
+    // Configure JWT
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -15,7 +15,7 @@ import { JwtStrategy } from './jwt.strategy';
         secret: configService.get<string>('JWT_SECRET'),
         signOptions: { expiresIn: '5m' },
       }),
-    }),
+    }), 
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy], 

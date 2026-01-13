@@ -8,6 +8,5 @@ export class LoginLogModel extends Model {
   user_id!: number | null;
   email!: string;
   status!: string;
-  ip_address!: string;
   attempt_time!: string;
 }
